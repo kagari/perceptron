@@ -1,3 +1,5 @@
+extern crate rand;
+extern crate csv;
 extern crate nalgebra as na;
 use f64;
 use std::str;
@@ -5,7 +7,7 @@ use std::str::FromStr;
 use std::vec::Vec;
 use na::{DMatrix, DVector, Matrix4};
 use rand::{Rng, SeedableRng, StdRng};
-
+use rand::distributions::{Normal, Distribution};
 
 fn main() {
     println!("Hello, world!");
@@ -32,16 +34,20 @@ fn main() {
 
     let dx = DMatrix::from_row_slice(nrows, ncols, &x);
 
-    let perceptron = Perceptron::new();
-//    perceptron.fit();
+    // パーセプトロンコンストラクタを生成
+    let mut perceptron = Perceptron::new();
+    // 学習
+    println!("a shape of dx: {:?}", dx.shape());
+    perceptron.fit(dx, vec![1., 2., 3., 4.]);
+    println!("perceptron w value is {:?}", perceptron.w_);
 }
 
 struct Perceptron {
     eta: f64,
     n_iter: u32,
-    random_state: i32,
-    w_: DMatrix<f64>,
-    error_: Vec<Vec<i32>>,
+    random_state: [u8; 32],
+    w_: Option<Vec<f64>>,
+    error_: Option<Vec<Vec<i32>>>,
 }
 
 impl Perceptron {
@@ -49,12 +55,28 @@ impl Perceptron {
         Perceptron {
             eta: 0.01,
             n_iter: 50,
-            random_state: 1,
+            random_state: [1; 32],
+            w_: None,
+            error_: None,
         }
     }
 
-    fn fit(&self, X: DMatrix<f64>, y: Vec<f64>) {
+    fn fit(&mut self, X: DMatrix<f64>, y: Vec<f64>) {
         let mut rng: StdRng = SeedableRng::from_seed(self.random_state);
-        self.w_ = (0..X)
+        let normal = Normal::new(2.0, 3.0);
+        self.w_ = Option::Some((0..X.shape().1).map(|_| normal.sample(&mut rng)).collect());
+        self.error_ = Option::Some(Vec::new());
+
+        for i in 0..self.n_iter { // n_iter回トレーニングを行う
+            // println!("epoch: {}", i);
+            let error = 0;
+            let mut i = 0;
+            for (xi, target) in X.row_iter().zip(y.iter()) { // yの長さに合わせられる
+                //println!("xi is {:?}", xi);
+                //println!("target is {}", target);
+                i += 1;
+            }
+            println!("i: {}", i);
+        }
     }
 }
