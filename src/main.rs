@@ -46,8 +46,8 @@ struct Perceptron {
     eta: f64,
     n_iter: u32,
     random_state: [u8; 32],
-    w_: Option<Vec<f64>>,
-    error_: Option<Vec<Vec<i32>>>,
+    w_: Vec<f64>,
+    error_: Vec<Vec<i32>>,
 }
 
 impl Perceptron {
@@ -56,27 +56,31 @@ impl Perceptron {
             eta: 0.01,
             n_iter: 50,
             random_state: [1; 32],
-            w_: None,
-            error_: None,
+            w_: Vec::new(),
+            error_: Vec::new(),
         }
     }
 
     fn fit(&mut self, X: DMatrix<f64>, y: Vec<f64>) {
+        let size = X.shape().1;
         let mut rng: StdRng = SeedableRng::from_seed(self.random_state);
         let normal = Normal::new(2.0, 3.0);
-        self.w_ = Option::Some((0..X.shape().1).map(|_| normal.sample(&mut rng)).collect());
-        self.error_ = Option::Some(Vec::new());
+        self.w_ = (0..size + 1).map(|_| normal.sample(&mut rng)).collect();
+        self.error_ = Vec::new();
 
         for i in 0..self.n_iter { // n_iter回トレーニングを行う
             // println!("epoch: {}", i);
             let error = 0;
-            let mut i = 0;
             for (xi, target) in X.row_iter().zip(y.iter()) { // yの長さに合わせられる
                 //println!("xi is {:?}", xi);
                 //println!("target is {}", target);
-                i += 1;
+                let update = self.eta * (target - self.predict(xi)); // 実際の値と予測値との誤差から更新ちを算出する
+                self.w_[1..size] = self.w_[1..size] + update * xi; // 1 * (1, 4)
             }
-            println!("i: {}", i);
         }
+    }
+
+    fn predict(&self, X: DMatrix<f64>) -> f64{
+        1.
     }
 }
