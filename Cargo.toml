@@ -1,0 +1,10 @@
+[package]
+name = "perceptron"
+version = "0.1.0"
+authors = ["kagari <e175766@ie.u-ryukyu.ac.jp>"]
+edition = "2018"
+
+[dependencies]
+csv = "1.0.7"
+nalgebra = "0.18.0"
+rand = "0.6"
