@@ -9,7 +9,6 @@ use ndarray::prelude::*;
 use std::fmt::Debug;
 
 fn main() {
-    println!("Hello, world");
     // シードからランダムな値を生成
     let mut rng: StdRng = SeedableRng::from_seed([1; 32]);
     // 正規分布に従う
@@ -37,8 +36,8 @@ fn main() {
     println!("perceptron is {:?}", &perceptron);
     
     // 予測を行う
-    let pred = perceptron.pred(Array1::from_shape_vec(4, vec![4., 4., 4., 4.,]).unwrap());
-    println!("prediction is {:?}", pred);
+    let pred = perceptron.pred(Array::from_shape_vec((1, 4), vec![4., 4., 4., 4.,]).unwrap());
+    println!("prediction is {:?}", pred.to_vec());
 }
 
 #[derive(Debug)]
@@ -65,7 +64,7 @@ impl Perceptron {
     fn fit(&mut self, X: &Array<f64, Ix2>, y: &Array1<f64>) -> &Self {
         let mut error = 0;
         for (x, target) in X.outer_iter().zip(y.outer_iter()) {
-            let update = self.eta * (target.to_owned() - self.pred(x.to_owned()));
+            let update = self.eta * (target.to_owned() - self._pred(x.to_owned()));
             // println!("update value is {:?}", update);
             let s = update.into_scalar(); // into_scalar()が所有権を奪うため、結果をsに格納する
             self.w = ((s * x.to_owned()) - &self.w) * -1.;
@@ -76,12 +75,21 @@ impl Perceptron {
         self
     }
 
-    // 予測を行う関数
-    fn pred(&self, X: Array<f64, Ix1>) -> f64 {
+    // 実データに対して予測を行う関数
+    fn pred(&self, X: Array<f64, Ix2>) -> Array1<f64> {
+        let mut pred = Vec::new();
+        for row in X.outer_iter() {
+            let y = self._pred(row.to_owned());
+            pred.push(y);
+        }
+        Array1::from_shape_vec(X.rows(), pred).unwrap()
+    }
+
+    // 1xn行列に対して予測を行う関数
+    fn _pred(&self, X: Array<f64, Ix1>) -> f64 {
         let x = X;
         let input_sum = x.dot(&self.w) + self.b; // 入力と重み(バイアスも含む)の積和を取る
         let pred = if input_sum > self.th { 1. } else { 0. };
         pred
     }
-
 }
