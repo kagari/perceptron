@@ -1,86 +1,70 @@
+// extern crate nalgebra as na;
+extern crate ndarray;
 extern crate rand;
-extern crate csv;
-extern crate nalgebra as na;
-use f64;
-use std::str;
-use std::str::FromStr;
-use std::vec::Vec;
-use na::{DMatrix, DVector, Matrix4};
-use rand::{Rng, SeedableRng, StdRng};
+use rand::SeedableRng;
+use rand::rngs::StdRng;
 use rand::distributions::{Normal, Distribution};
+// use na::core::DMatrix;
+use ndarray::prelude::*;
+use std::fmt::Debug;
 
 fn main() {
-    println!("Hello, world!");
+    println!("Hello, world");
+    // シードからランダムな値を生成
+    let mut rng: StdRng = SeedableRng::from_seed([1; 32]);
+    // 正規分布に従う
+    let normal = Normal::new(1.0, 0.0);
 
-    // irisデータセットを使用
-    let path = "./data/iris.csv";
-    let mut reader = csv::Reader::from_path(path).unwrap();
 
-    let mut x: Vec<f64> = vec![];
-    let mut nrows: usize = 0;
+    // X: 入力データ(nxm行列)
+    // y: 目的データ(nx1行列)
+    // x: 入力信号(1xm行列)
+    // w: 重み(mx1行列)
+    // b: バイアス(1x1要素)
+    // th: 閾値(要素)
+    let X = Array::from_shape_vec((1, 4), vec![0., 0., 0., 0.]).unwrap();
+    // let x = X;
+    let y = 1;
+    let w = Array1::from_shape_vec(4, vec![1., 2., 3., 4.,]).unwrap();
+    let b = Option::Some(normal.sample(&mut rng));
+    let th = Option::Some(1.);
 
-    for record in reader.byte_records().map(|r| r.unwrap()) {
-        // f64 に変換できる列のみ読み込み
-        for item in record.iter().map(|i| str::from_utf8(i).unwrap()) {
-            match f64::from_str(item) {
-                Ok(v) => x.push(v),
-                Err(e) => {}
-            };
-        }
-        nrows += 1;
-    }
+    let perceptron = Perceptron::new(&w, &b, &th);
+    println!("perceptron is {:?}", &perceptron);
 
-    let ncols = x.len() / nrows;
+    let perceptron = perceptron.fit(X, Array1::from_shape_vec(1, vec![1.]).unwrap());
 
-    let dx = DMatrix::from_row_slice(nrows, ncols, &x);
-
-    // パーセプトロンコンストラクタを生成
-    let mut perceptron = Perceptron::new();
-    // 学習
-    println!("a shape of dx: {:?}", dx.shape());
-    perceptron.fit(dx, vec![1., 2., 3., 4.]);
-    println!("perceptron w value is {:?}", perceptron.w_);
+    // println!("x is {:?}", x);
+    // println!("w is {:?}", w);
+    // let input_sum = (x.dot(&w) + b).into_raw_vec()[0];
+    // println!("input sum: {:?}", input_sum);
+    
+    // let pred = if input_sum > th { 1 } else { 0 };
+    // println!("pred is {:?}", pred);
 }
 
-struct Perceptron {
-    eta: f64,
-    n_iter: u32,
-    random_state: [u8; 32],
-    w_: Vec<f64>,
-    error_: Vec<Vec<i32>>,
+#[derive(Debug)]
+struct Perceptron<'a> {
+    w: &'a Array1<f64>, // 重み (4x1行列)
+    b: &'a Option<f64>, // バイアス
+    th: &'a Option<f64>, // 閾値
 }
 
-impl Perceptron {
-    fn new() -> Perceptron {
+impl<'a> Perceptron<'a> {
+    fn new(w: &'a Array1<f64>, b: &'a Option<f64>, th: &'a Option<f64>) -> Self {
         Perceptron {
-            eta: 0.01,
-            n_iter: 50,
-            random_state: [1; 32],
-            w_: Vec::new(),
-            error_: Vec::new(),
+            w,
+            b,
+            th,
         }
     }
 
-    fn fit(&mut self, X: DMatrix<f64>, y: Vec<f64>) {
-        let size = X.shape().1;
-        let mut rng: StdRng = SeedableRng::from_seed(self.random_state);
-        let normal = Normal::new(2.0, 3.0);
-        self.w_ = (0..size + 1).map(|_| normal.sample(&mut rng)).collect();
-        self.error_ = Vec::new();
-
-        for i in 0..self.n_iter { // n_iter回トレーニングを行う
-            // println!("epoch: {}", i);
-            let error = 0;
-            for (xi, target) in X.row_iter().zip(y.iter()) { // yの長さに合わせられる
-                //println!("xi is {:?}", xi);
-                //println!("target is {}", target);
-                let update = self.eta * (target - self.predict(xi)); // 実際の値と予測値との誤差から更新ちを算出する
-                self.w_[1..size] = self.w_[1..size] + update * xi; // 1 * (1, 4)
-            }
-        }
-    }
-
-    fn predict(&self, X: DMatrix<f64>) -> f64{
-        1.
+    fn fit(&self, X: Array<f64, Ix2>, y: Array1<f64>) -> &Self {
+        let x = X;
+        let input_sum = (x.dot(self.w) + self.b.unwrap()).into_raw_vec()[0];
+        println!("input sum: {:?}", input_sum);
+        let pred = if input_sum > self.th.unwrap() { 1 } else { 0 };
+        println!("pred is {:?}", pred);
+        self
     }
 }
