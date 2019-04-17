@@ -22,49 +22,66 @@ fn main() {
     // w: 重み(mx1行列)
     // b: バイアス(1x1要素)
     // th: 閾値(要素)
-    let X = Array::from_shape_vec((1, 4), vec![0., 0., 0., 0.]).unwrap();
-    // let x = X;
-    let y = 1;
+    let X = Array::from_shape_vec((3, 4), vec![1., 1., 1., 1., 2., 2., 2., 2., 3., 3., 3., 3.,]).unwrap();
+    let y = Array1::from_shape_vec(3, vec![1., 2., 3.,]).unwrap();
     let w = Array1::from_shape_vec(4, vec![1., 2., 3., 4.,]).unwrap();
-    let b = Option::Some(normal.sample(&mut rng));
-    let th = Option::Some(1.);
+    let b = normal.sample(&mut rng);
+    let th = 1.;
 
-    let perceptron = Perceptron::new(&w, &b, &th);
+    // パーセプトロンのインスタンスを作成
+    let mut perceptron = Perceptron::new(w, b, th);
     println!("perceptron is {:?}", &perceptron);
 
-    let perceptron = perceptron.fit(X, Array1::from_shape_vec(1, vec![1.]).unwrap());
-
-    // println!("x is {:?}", x);
-    // println!("w is {:?}", w);
-    // let input_sum = (x.dot(&w) + b).into_raw_vec()[0];
-    // println!("input sum: {:?}", input_sum);
+    // 学習を行う関数
+    let perceptron = perceptron.fit(&X, &y);
+    println!("perceptron is {:?}", &perceptron);
     
-    // let pred = if input_sum > th { 1 } else { 0 };
-    // println!("pred is {:?}", pred);
+    // 予測を行う
+    let pred = perceptron.pred(Array1::from_shape_vec(4, vec![4., 4., 4., 4.,]).unwrap());
+    println!("prediction is {:?}", pred);
 }
 
 #[derive(Debug)]
-struct Perceptron<'a> {
-    w: &'a Array1<f64>, // 重み (4x1行列)
-    b: &'a Option<f64>, // バイアス
-    th: &'a Option<f64>, // 閾値
+struct Perceptron {
+    w: Array1<f64>, // 重み (4x1行列)
+    b: f64, // バイアス
+    th: f64, // 閾値
+    eta: f64, // 学習率
+    error: Vec<i32>,
 }
 
-impl<'a> Perceptron<'a> {
-    fn new(w: &'a Array1<f64>, b: &'a Option<f64>, th: &'a Option<f64>) -> Self {
+impl Perceptron {
+    fn new(w: Array1<f64>, b: f64, th: f64) -> Self {
         Perceptron {
             w,
             b,
             th,
+            eta: 0.01,
+            error: Vec::new(),
         }
     }
 
-    fn fit(&self, X: Array<f64, Ix2>, y: Array1<f64>) -> &Self {
-        let x = X;
-        let input_sum = (x.dot(self.w) + self.b.unwrap()).into_raw_vec()[0];
-        println!("input sum: {:?}", input_sum);
-        let pred = if input_sum > self.th.unwrap() { 1 } else { 0 };
-        println!("pred is {:?}", pred);
+    // 学習を行う関数
+    fn fit(&mut self, X: &Array<f64, Ix2>, y: &Array1<f64>) -> &Self {
+        let mut error = 0;
+        for (x, target) in X.outer_iter().zip(y.outer_iter()) {
+            let update = self.eta * (target.to_owned() - self.pred(x.to_owned()));
+            // println!("update value is {:?}", update);
+            let s = update.into_scalar(); // into_scalar()が所有権を奪うため、結果をsに格納する
+            self.w = ((s * x.to_owned()) - &self.w) * -1.;
+            self.b += s;
+            error += if s != 0. { 1 } else { 0 };
+        }
+        self.error.push(error);
         self
     }
+
+    // 予測を行う関数
+    fn pred(&self, X: Array<f64, Ix1>) -> f64 {
+        let x = X;
+        let input_sum = x.dot(&self.w) + self.b; // 入力と重み(バイアスも含む)の積和を取る
+        let pred = if input_sum > self.th { 1. } else { 0. };
+        pred
+    }
+
 }
