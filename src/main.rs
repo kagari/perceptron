@@ -18,10 +18,11 @@ fn main() {
     // w: 重み(mx1行列)
     // b: バイアス(1x1要素)
     // th: 閾値(要素)
-    let X = Array::from_shape_vec((4, 4), vec![1., 1., 1., 1., 2., 2., 2., 2., 1., 1., 1., 1., 2., 2., 2., 2.,]).unwrap();
+    let X = Array2::from_shape_vec((4, 4), vec![1., 1., 1., 1., 2., 2., 2., 2., 1., 1., 1., 1., 2., 2., 2., 2.,]).unwrap();
     println!("X: {:?}", X);
     let y = Array1::from_shape_vec(4, vec![0., 1., 0., 1.,]).unwrap();
     let w = (0..X.cols()).map(|_| normal.sample(&mut rng)).collect::<Vec<f64>>();
+    println!("w: {:?}", w);
     let w = Array1::from_shape_vec(4, w).unwrap();
     let b = normal.sample(&mut rng);
     let th = 0.01;
@@ -36,6 +37,6 @@ fn main() {
     
     // 予測を行う
     let test_X = Array::from_shape_vec((1, 4), vec![2., 2., 2., 2.,]).unwrap();
-    let pred = perceptron.pred(test_X);
+    let pred = perceptron.pred(&X);
     println!("prediction is {:?}", pred.to_vec());
 }

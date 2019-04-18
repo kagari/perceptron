@@ -23,7 +23,7 @@ impl Perceptron {
     }
 
     // 学習を行う関数
-    pub fn fit(&mut self, X: &Array<f64, Ix2>, y: &Array1<f64>, n_iter: i32) -> &Self {
+    pub fn fit(&mut self, X: &Array2<f64>, y: &Array1<f64>, n_iter: i32) -> &Self {
         for _ in 0..n_iter {
             let mut error = 0;
             for (x, target) in X.outer_iter().zip(y.outer_iter()) {
@@ -39,7 +39,7 @@ impl Perceptron {
     }
 
     // 実データに対して予測を行う関数
-    pub fn pred(&self, X: Array<f64, Ix2>) -> Array1<f64> {
+    pub fn pred(&self, X: &Array2<f64>) -> Array1<f64> {
         let mut pred = Vec::new();
         for row in X.outer_iter() {
             let y = self._pred(row.to_owned());
@@ -49,7 +49,7 @@ impl Perceptron {
     }
 
     // 1xn行列に対して予測を行う関数
-    fn _pred(&self, X: Array<f64, Ix1>) -> f64 {
+    fn _pred(&self, X: Array1<f64>) -> f64 {
         let x = X;
         let input_sum = x.dot(&self.w) + self.b; // 入力と重み(バイアスも含む)の積和を取る
         let pred = if input_sum > self.th { 1. } else { 0. };
