@@ -28,10 +28,10 @@ impl Perceptron {
             let mut error = 0;
             for (x, target) in X.outer_iter().zip(y.outer_iter()) {
                 let update = self.eta * (target.to_owned() - self._pred(x.to_owned()));
-                let s = update.into_scalar(); // into_scalar()が所有権を奪うため、結果をsに格納する
-                self.w = ((s * x.to_owned()) - &self.w) * -1.;
-                self.b += s;
-                error += if s != 0. { 1 } else { 0 };
+                let update = update.into_scalar(); // into_scalar()が所有権を奪うため、結果をsに格納する
+                self.w = update * x.to_owned() + &self.w;
+                self.b += update;
+                error += if update != 0. { 1 } else { 0 };
             }
             self.error.push(error);
         }
@@ -51,8 +51,8 @@ impl Perceptron {
     // 1xn行列に対して予測を行う関数
     fn _pred(&self, X: Array1<f64>) -> f64 {
         let x = X;
-        let input_sum = x.dot(&self.w) + self.b; // 入力と重み(バイアスも含む)の積和を取る
-        let pred = activation_function::step_function(input_sum);
+        let sop = x.dot(&self.w) + self.b; // 入力と重み(バイアスも含む)の積和(sum of product -> sop)を取る
+        let pred = activation_function::step_function(sop);
         pred
     }
 }
