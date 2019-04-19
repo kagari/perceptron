@@ -3,6 +3,7 @@ use ndarray::prelude::*;
 use std::fmt::Debug;
 
 mod activation_function;
+pub mod adaline;
 
 #[derive(Debug)]
 pub struct Perceptron {

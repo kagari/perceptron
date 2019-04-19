@@ -14,6 +14,7 @@ use std::f64;
 use std::str::FromStr;
 extern crate perceptron;
 use perceptron::Perceptron;
+use perceptron::adaline::Adaline;
 
 fn main() {
     // シードからランダムな値を生成
@@ -49,28 +50,42 @@ fn main() {
     let w = Array1::from_shape_vec(2, w).unwrap();
     let b = normal.sample(&mut rng);
     
-    // パーセプトロンのインスタンスを作成
-    let mut perceptron = Perceptron::new(w, b);
-    println!("perceptron : {:?}", &perceptron);
+    // // パーセプトロンのインスタンスを作成
+    // let mut perceptron = Perceptron::new(w, b);
+    // println!("perceptron : {:?}", &perceptron);
 
-    // 学習を行う関数
-    let perceptron = perceptron.fit(&X, &y, 10);
-    println!("perceptron : {:?}", &perceptron);
+    // // 学習を行う関数
+    // let perceptron = perceptron.fit(&X, &y, 10);
+    // println!("perceptron : {:?}", &perceptron);
     
-    // 予測を行う
-    // 1.0と予測するはず
+    // // 予測を行う
+    // // 1.0と予測するはず
     let test_X = X.slice_axis(Axis(0), Slice::from(0..5)).to_owned(); // s! macroが使えなかったので
     let test_y = y.slice_axis(Axis(0), Slice::from(0..5)).to_owned(); // s! macroが使えなかったので
-    let pred = perceptron.pred(&test_X);
-    println!("test_y     : {:?}", test_y);
-    println!("prediction : {:?}", pred.to_vec());
-    println!("prediction : {}", pred == test_y);
+    // let pred = perceptron.pred(&test_X);
+    // println!("test_y     : {:?}", test_y);
+    // println!("prediction : {:?}", pred.to_vec());
+    // println!("prediction : {}", pred == test_y);
+
+    // let test_X = X.slice_axis(Axis(0), Slice::from(-5..)).to_owned(); // s! macroが使えなかったので
+    // let test_y = y.slice_axis(Axis(0), Slice::from(-5..)).to_owned(); // s! macroが使えなかったので
+    // let pred = perceptron.pred(&test_X);
+    // println!("test_y     : {:?}", test_y);
+    // println!("prediction : {:?}", pred.to_vec());
+    // println!("prediction : {}", pred == test_y);
+
+    let mut adaline = Adaline::new(w, b);
+    println!("adaline: {:?}", adaline);
+    let adaline = adaline.fit(&X, &y, 100);
+    println!("adaline: {:?}", adaline);
+    let pred = adaline.pred(&test_X);
+    println!("pred: {:?}", pred);
+    println!("test: {}", pred == test_y);
 
     let test_X = X.slice_axis(Axis(0), Slice::from(-5..)).to_owned(); // s! macroが使えなかったので
     let test_y = y.slice_axis(Axis(0), Slice::from(-5..)).to_owned(); // s! macroが使えなかったので
-    let pred = perceptron.pred(&test_X);
+    let pred = adaline.pred(&test_X);
     println!("test_y     : {:?}", test_y);
     println!("prediction : {:?}", pred.to_vec());
     println!("prediction : {}", pred == test_y);
-
 }
