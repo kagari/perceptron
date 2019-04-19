@@ -44,21 +44,18 @@ fn main() {
     // b: バイアス(1x1要素)
     // let X = Array2::from_shape_vec((X.len()/4, 4), X).unwrap().slice_axis(Axis(1), Slice::from(..100)).to_owned();
     let X = Array2::from_shape_vec((X.len()/4, 4), X).unwrap().select(Axis(1), &[0, 2]).slice(s![..100, ..]).to_owned();
-    println!("X is {:?}", X);
     let y = Array1::from_shape_vec(y.len(), y).unwrap().slice(s![..100]).to_owned();
-    println!("y is {:?}", y);
     let w = (0..X.cols()).map(|_| normal.sample(&mut rng)).collect::<Vec<f64>>();
     let w = Array1::from_shape_vec(2, w).unwrap();
     let b = normal.sample(&mut rng);
-    println!("w: {:?}", w);
     
     // パーセプトロンのインスタンスを作成
     let mut perceptron = Perceptron::new(w, b);
-    println!("perceptron is {:?}", &perceptron);
+    println!("perceptron : {:?}", &perceptron);
 
     // 学習を行う関数
-    let perceptron = perceptron.fit(&X, &y, 1000);
-    println!("perceptron is {:?}", &perceptron);
+    let perceptron = perceptron.fit(&X, &y, 10);
+    println!("perceptron : {:?}", &perceptron);
     
     // 予測を行う
     // 1.0と予測するはず
