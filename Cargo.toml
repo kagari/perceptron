@@ -7,5 +7,5 @@ edition = "2018"
 [dependencies]
 csv = "1.0.7"
 ndarray = "0.12.1"
-# nalgebra = "0.18.0"
+ndarray-csv = "0.3.1"
 rand = "0.6"

@@ -2,22 +2,22 @@ extern crate ndarray;
 use ndarray::prelude::*;
 use std::fmt::Debug;
 
+mod activation_function;
+
 #[derive(Debug)]
 pub struct Perceptron {
     w: Array1<f64>, // 重み (4x1行列)
     b: f64, // バイアス
-    th: f64, // 閾値
     eta: f64, // 学習率
     error: Vec<i32>,
 }
 
 impl Perceptron {
-    pub fn new(w: Array1<f64>, b: f64, th: f64) -> Self {
+    pub fn new(w: Array1<f64>, b: f64) -> Self {
         Perceptron {
             w,
             b,
-            th,
-            eta: 0.1,
+            eta: 0.01,
             error: Vec::new(),
         }
     }
@@ -52,7 +52,7 @@ impl Perceptron {
     fn _pred(&self, X: Array1<f64>) -> f64 {
         let x = X;
         let input_sum = x.dot(&self.w) + self.b; // 入力と重み(バイアスも含む)の積和を取る
-        let pred = if input_sum > self.th { 1. } else { 0. };
+        let pred = activation_function::step_function(input_sum);
         pred
     }
 }
