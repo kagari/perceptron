@@ -60,8 +60,8 @@ fn main() {
     
     // // 予測を行う
     // // 1.0と予測するはず
-    let test_X = X.slice_axis(Axis(0), Slice::from(0..5)).to_owned(); // s! macroが使えなかったので
-    let test_y = y.slice_axis(Axis(0), Slice::from(0..5)).to_owned(); // s! macroが使えなかったので
+    // let test_X = X.slice_axis(Axis(0), Slice::from(0..5)).to_owned(); // s! macroが使えなかったので
+    // let test_y = y.slice_axis(Axis(0), Slice::from(0..5)).to_owned(); // s! macroが使えなかったので
     // let pred = perceptron.pred(&test_X);
     // println!("test_y     : {:?}", test_y);
     // println!("prediction : {:?}", pred.to_vec());
@@ -74,18 +74,48 @@ fn main() {
     // println!("prediction : {:?}", pred.to_vec());
     // println!("prediction : {}", pred == test_y);
 
+    // let mut adaline = Adaline::new(w, b);
+    // println!("adaline: {:?}", adaline);
+
+    // let test_X = X.slice_axis(Axis(0), Slice::from(0..5)).to_owned(); // s! macroが使えなかったので
+    // let test_y = y.slice_axis(Axis(0), Slice::from(0..5)).to_owned(); // s! macroが使えなかったので
+    // let adaline = adaline.fit(&X, &y, 100);
+    // println!("adaline: {:?}", adaline);
+    // let pred = adaline.pred(&test_X);
+    // println!("test_y     : {:?}", test_y);
+    // println!("pred: {:?}", pred);
+    // println!("test: {}", pred == test_y);
+
+    // let test_X = X.slice_axis(Axis(0), Slice::from(-5..)).to_owned(); // s! macroが使えなかったので
+    // let test_y = y.slice_axis(Axis(0), Slice::from(-5..)).to_owned(); // s! macroが使えなかったので
+    // let adaline = adaline.fit(&X, &y, 100);
+    // let pred = adaline.pred(&test_X);
+    // println!("test_y     : {:?}", test_y);
+    // println!("pred : {:?}", pred.to_vec());
+    // println!("test : {}", pred == test_y);
+
+    // 標準化 standardizationを行い、学習がうまくいくことを確認する
     let mut adaline = Adaline::new(w, b);
     println!("adaline: {:?}", adaline);
-    let adaline = adaline.fit(&X, &y, 100);
+    
+    // 訓練データの標準化
+    let X_std = (&X - &X.mean_axis(Axis(0))) / &X.std_axis(Axis(0), 0.);
+    let adaline = adaline.fit(&X_std, &y, 100); // 学習
     println!("adaline: {:?}", adaline);
+
+    // 訓練データを用いて学習が上手くいっているかの確認(1と予測)
+    let test_X = X_std.slice(s![..5, ..]).to_owned();
+    let test_y = y.slice(s![..5]).to_owned();
     let pred = adaline.pred(&test_X);
+    println!("test_y     : {:?}", test_y);
     println!("pred: {:?}", pred);
     println!("test: {}", pred == test_y);
 
-    let test_X = X.slice_axis(Axis(0), Slice::from(-5..)).to_owned(); // s! macroが使えなかったので
-    let test_y = y.slice_axis(Axis(0), Slice::from(-5..)).to_owned(); // s! macroが使えなかったので
+    // 訓練データを用いて学習が上手くいっているかの確認(-1と予測)
+    let test_X = X_std.slice(s![-5.., ..]).to_owned();
+    let test_y = y.slice(s![-5..]).to_owned();
     let pred = adaline.pred(&test_X);
     println!("test_y     : {:?}", test_y);
-    println!("prediction : {:?}", pred.to_vec());
-    println!("prediction : {}", pred == test_y);
+    println!("pred : {:?}", pred.to_vec());
+    println!("test : {}", pred == test_y);
 }

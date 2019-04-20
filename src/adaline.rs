@@ -14,13 +14,13 @@ impl Adaline {
         Adaline {
             w,
             b,
-            eta: 0.0001,
+            eta: 0.01,
             cost: Vec::new(),
         }
     }
 
     // 学習を行う関数
-    pub fn fit(&mut self, X: &Array2<f64>, y: &Array1<f64>, n_iter: i32) -> &Self {
+    pub fn fit(mut self, X: &Array2<f64>, y: &Array1<f64>, n_iter: i32) -> Self {
         for _ in 0..n_iter {
             let net_input = self.net_input(&X);
             let output = self.activation(net_input); // outputはベクトル
