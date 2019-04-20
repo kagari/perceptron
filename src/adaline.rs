@@ -2,16 +2,16 @@ use ndarray::prelude::*;
 use std::fmt::Debug;
 
 #[derive(Debug)]
-pub struct AdalineDG {
+pub struct AdalineGD {
     w: Array1<f64>, // 重み (4x1行列)
     b: f64, // バイアス
     eta: f64, // 学習率
     cost: Vec<f64>,
 }
 
-impl AdalineDG {
+impl AdalineGD {
     pub fn new(w: Array1<f64>, b: f64) -> Self {
-        AdalineDG {
+        AdalineGD {
             w,
             b,
             eta: 0.01,
@@ -49,7 +49,7 @@ impl AdalineDG {
 }
 
 #[derive(Debug)]
-pub struct AdalineSDG {
+pub struct AdalineSGD {
     w: Array1<f64>, // 重み (4x1行列)
     b: f64, // バイアス
     eta: f64, // 学習率p
@@ -57,9 +57,9 @@ pub struct AdalineSDG {
     is_shuffle: bool, // エポックごとにシャッフルするかのフラグ
 }
 
-impl AdalineSDG {
+impl AdalineSGD {
     pub fn new(w: Array1<f64>, b: f64, shuffle: bool) -> Self {
-        AdalineSDG {
+        AdalineSGD {
             w,
             b,
             eta: 0.01,

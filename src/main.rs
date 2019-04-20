@@ -14,7 +14,7 @@ use std::f64;
 use std::str::FromStr;
 extern crate perceptron;
 use perceptron::Perceptron;
-use perceptron::adaline::{AdalineDG, AdalineSDG};
+use perceptron::adaline::{AdalineGD, AdalineSGD};
 
 fn main() {
     // シードからランダムな値を生成
@@ -74,39 +74,39 @@ fn main() {
     // println!("prediction : {:?}", pred.to_vec());
     // println!("prediction : {}", pred == test_y);
 
-    // let mut adaline_dg = AdalineDG::new(w, b);
-    // println!("adaline_dg: {:?}", adaline_dg);
+    // let mut adaline_gd = AdalineGD::new(w, b);
+    // println!("adaline_gd: {:?}", adaline_gd);
 
     // let test_X = X.slice_axis(Axis(0), Slice::from(0..5)).to_owned(); // s! macroが使えなかったので
     // let test_y = y.slice_axis(Axis(0), Slice::from(0..5)).to_owned(); // s! macroが使えなかったので
-    // let adaline_dg = adaline_dg.fit(&X, &y, 100);
-    // println!("adaline_dg: {:?}", adaline_dg);
-    // let pred = adaline_dg.pred(&test_X);
+    // let adaline_dg = adaline_gd.fit(&X, &y, 100);
+    // println!("adaline_gd: {:?}", adaline_gd);
+    // let pred = adaline_gd.pred(&test_X);
     // println!("test_y     : {:?}", test_y);
     // println!("pred: {:?}", pred);
     // println!("test: {}", pred == test_y);
 
     // let test_X = X.slice_axis(Axis(0), Slice::from(-5..)).to_owned(); // s! macroが使えなかったので
     // let test_y = y.slice_axis(Axis(0), Slice::from(-5..)).to_owned(); // s! macroが使えなかったので
-    // let adaline_dg = adaline_dg.fit(&X, &y, 100);
-    // let pred = adaline_dg.pred(&test_X);
+    // let adaline_dg = adaline_gd.fit(&X, &y, 100);
+    // let pred = adaline_gd.pred(&test_X);
     // println!("test_y     : {:?}", test_y);
     // println!("pred : {:?}", pred.to_vec());
     // println!("test : {}", pred == test_y);
 
     // // 標準化 standardizationを行い、学習がうまくいくことを確認する
-    // let mut adaline_dg = AdalineDG::new(w, b);
-    // println!("adaline_dg: {:?}", adaline_dg);
+    // let mut adaline_gd = AdalineDG::new(w, b);
+    // println!("adaline_gd: {:?}", adaline_gd);
     
     // // 訓練データの標準化
     // let X_std = (&X - &X.mean_axis(Axis(0))) / &X.std_axis(Axis(0), 0.);
-    // let adaline_dg = adaline_dg.fit(&X_std, &y, 100); // 学習
-    // println!("adaline_dg: {:?}", adaline_dg);
+    // let adaline_dg = adaline_gd.fit(&X_std, &y, 100); // 学習
+    // println!("adaline_gd: {:?}", adaline_gd);
 
     // // 訓練データを用いて学習が上手くいっているかの確認(1と予測)
     // let test_X = X_std.slice(s![..5, ..]).to_owned();
     // let test_y = y.slice(s![..5]).to_owned();
-    // let pred = adaline_dg.pred(&test_X);
+    // let pred = adaline_gd.pred(&test_X);
     // println!("test_y     : {:?}", test_y);
     // println!("pred: {:?}", pred);
     // println!("test: {}", pred == test_y);
@@ -114,21 +114,21 @@ fn main() {
     // // 訓練データを用いて学習が上手くいっているかの確認(-1と予測)
     // let test_X = X_std.slice(s![-5.., ..]).to_owned();
     // let test_y = y.slice(s![-5..]).to_owned();
-    // let pred = adaline_dg.pred(&test_X);
+    // let pred = adaline_gd.pred(&test_X);
     // println!("test_y     : {:?}", test_y);
     // println!("pred : {:?}", pred.to_vec());
     // println!("test : {}", pred == test_y);
         
     // ADALINESDGを使って確率的勾配降下法を試す
-    let adaline_sdg = AdalineSDG::new(w, b, true);
-    println!("adaline_sdg: {:?}", adaline_sdg);
-    let adaline_sdg = adaline_sdg.fit(&X, &y, 100); // 学習
-    println!("adaline_sdg: {:?}", adaline_sdg);
+    let adaline_sgd = AdalineSGD::new(w, b, true);
+    println!("adaline_sdg: {:?}", adaline_sgd);
+    let adaline_sgd = adaline_sgd.fit(&X, &y, 100); // 学習
+    println!("adaline_sdg: {:?}", adaline_sgd);
 
     // 訓練データを用いて学習が上手くいっているかの確認(1と予測)
     let test_X = X.slice(s![..5, ..]).to_owned();
     let test_y = y.slice(s![..5]).to_owned();
-    let pred = adaline_sdg.pred(&test_X);
+    let pred = adaline_sgd.pred(&test_X);
     println!("test_y     : {:?}", test_y);
     println!("pred: {:?}", pred);
     println!("test: {}", pred == test_y);
@@ -136,7 +136,7 @@ fn main() {
     // 訓練データを用いて学習が上手くいっているかの確認(-1と予測)
     let test_X = X.slice(s![-5.., ..]).to_owned();
     let test_y = y.slice(s![-5..]).to_owned();
-    let pred = adaline_sdg.pred(&test_X);
+    let pred = adaline_sgd.pred(&test_X);
     println!("test_y     : {:?}", test_y);
     println!("pred : {:?}", pred.to_vec());
     println!("test : {}", pred == test_y);
