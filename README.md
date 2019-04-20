@@ -7,5 +7,5 @@ Perceptron was written in Rust. This repository was created to machine learning 
 ## 実装
 
 - Perceptron: パーセプトロン
-- Adaline_dg: 勾配降下法
-- Adaline_sdg: 確率的勾配降下法
+- Adaline_gd: 勾配降下法
+- Adaline_sgd: 確率的勾配降下法
